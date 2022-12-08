@@ -9,3 +9,100 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model University {
+  id               String @id @default(uuid())
+  universityName   String @unique @db.VarChar(255)
+  universityDomain String @unique @db.VarChar(100)
+
+  schools School[]
+}
+
+model School {
+  id         String @id @default(uuid())
+  schoolName String @db.VarChar(255)
+  schoolCode String @db.VarChar(6)
+
+  university   University @relation(fields: [universityID], references: [id])
+  universityID String
+
+  departments Department[]
+}
+
+model Department {
+  id             String @id @default(uuid())
+  departmentName String @db.VarChar(255)
+  departmentCode String @db.VarChar(6)
+
+  school   School @relation(fields: [schoolID], references: [id])
+  schoolID String
+
+  programs Program[]
+
+  faculties User[]
+}
+
+model Program {
+  id           String @id @default(uuid())
+  programName  String @db.VarChar(255)
+  programCode  String @db.VarChar(6)
+  totalCredits Int
+
+  department   Department @relation(fields: [departmentID], references: [id])
+  departmentID String
+
+  courses Course[]
+
+  students User[]
+}
+
+model Course {
+  id           String @id @default(uuid())
+  courseName   String @db.VarChar(255)
+  courseCode   String @db.VarChar(6)
+  courseCredit Int
+
+  coOffered    Course? @relation("cooffered", fields: [coOfferedID], references: [id])
+  coOfferedID  String
+
+  coOfferedWith Course[] @relation("cooffered")
+
+  program Program @relation(fields: [programID], references: [id])
+  programID String
+
+  prerequisites Course[] @relation("prerequisite")
+  prerequisitesTo Course[] @relation("prerequisite")
+}
+
+enum UserType {
+  SUPER_ADMIN
+  UGCIEB
+  UNIVERSITY_ADMIN
+  VC
+  DEAN
+  DEPT_HEAD
+  FACULTY
+  STUDENT
+}
+
+model User {
+  id String @id @default(uuid())
+  organizationID String @db.VarChar(20)
+  firstName String @db.VarChar(55)
+  lastName String @db.VarChar(55)
+  email String @db.VarChar(55)
+  phone String @db.Char(14)
+  house String? @db.VarChar(30)
+  street String? @db.VarChar(100)
+  town String @db.VarChar(100)
+  city String @db.VarChar(100)
+  dateOfBirth DateTime @db.Date
+  joiningDate DateTime @db.Date
+  userType UserType
+
+  program Program? @relation(fields: [programID], references: [id])
+  programID String?
+
+  department Department? @relation(fields: [departmentID], references: [id])
+  departmentID String?
+}
