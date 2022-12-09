@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { UniversityDto } from './university.dto';
+import { CreateUniversityDto } from './university.dto';
 import { UniversityService } from './university.service';
 
 @Controller('university')
@@ -12,7 +12,7 @@ export class UniversityController {
     }
 
     @Post("add")
-    async addUniversity(@Body() university: UniversityDto) {
+    async addUniversity(@Body() university: CreateUniversityDto) {
         const added = await this.universityService.addUniversity(university);
 
         if (added) {

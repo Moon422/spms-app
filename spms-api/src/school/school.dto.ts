@@ -1,11 +1,15 @@
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class CreateUniversityDto {
+export class CreateSchoolDto {
     @IsString()
     @IsNotEmpty()
     name: string;
 
     @IsString()
     @IsNotEmpty()
-    domain: string;
+    code: string;
+
+    @IsString()
+    @IsNotEmpty()
+    universityID: string;
 }

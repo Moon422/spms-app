@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DbService } from 'src/db/db.service';
-import { UniversityDto } from './university.dto';
+import { CreateUniversityDto } from './university.dto';
 
 @Injectable()
 export class UniversityService {
@@ -12,18 +12,17 @@ export class UniversityService {
         return universities;
     }
 
-    async addUniversity(university: UniversityDto) {
-        const addedUni = await this.dbService.university.create({
-            data: {
-                universityName: university.name,
-                universityDomain: university.domain
-            }
-        });
-
-        if (addedUni) {
-            return true;
+    async addUniversity(university: CreateUniversityDto) {
+        try {
+            const addedUni = await this.dbService.university.create({
+                data: {
+                    universityName: university.name,
+                    universityDomain: university.domain
+                }
+            });
+        } catch (e) {
+            console.log(e);
+            return false;
         }
-
-        return false;
     }
 }
