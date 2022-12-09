@@ -39,7 +39,7 @@ model Department {
 
   programs Program[]
 
-  faculties User[]
+  faculties Faculty[]
 }
 
 model Program {
@@ -53,7 +53,9 @@ model Program {
 
   courses Course[]
 
-  students User[]
+  students Student[]
+
+  plos PLO[]
 }
 
 model Course {
@@ -62,16 +64,116 @@ model Course {
   courseCode   String @db.VarChar(6)
   courseCredit Int
 
-  coOffered    Course? @relation("cooffered", fields: [coOfferedID], references: [id])
-  coOfferedID  String
+  coOffered   Course? @relation("cooffered", fields: [coOfferedID], references: [id])
+  coOfferedID String
 
   coOfferedWith Course[] @relation("cooffered")
 
-  program Program @relation(fields: [programID], references: [id])
+  program   Program @relation(fields: [programID], references: [id])
   programID String
 
-  prerequisites Course[] @relation("prerequisite")
+  prerequisites   Course[] @relation("prerequisite")
   prerequisitesTo Course[] @relation("prerequisite")
+
+  sections Section[]
+
+  cos CO[]
+}
+
+enum Semester {
+  SPRING
+  SUMMER
+  AUTUMN
+}
+
+model Section {
+  id              String   @id @default(uuid())
+  sectionNumber   Int
+  semester        Semester
+  year            Int
+  maximumCapacity Int
+
+  faculty   Faculty @relation(fields: [facultyID], references: [id])
+  facultyID String
+
+  course   Course @relation(fields: [courseID], references: [id])
+  courseID String
+
+  courseRegistrations CourseRegistration[]
+
+  assessments Assessment[]
+}
+
+model CourseRegistration {
+  student   Student @relation(fields: [studentID], references: [id])
+  studentID String
+
+  section   Section @relation(fields: [sectionID], references: [id])
+  sectionID String
+
+  registrationDate DateTime @db.Date
+
+  @@id([studentID, sectionID])
+}
+
+enum AssessmentType {
+  CLASS_TEST
+  MID_TERM
+  FINAL_TERM
+  PROJECT
+  ASSIGNMENT
+}
+
+model Assessment {
+  id             String         @id @default(uuid())
+  questionNumber Int
+  assessmentType AssessmentType
+  totalMarks     Float
+
+  section   Section @relation(fields: [sectionID], references: [id])
+  sectionID String
+
+  co         CO           @relation(fields: [coID], references: [id])
+  coID       String
+
+  evaluations Evaluation[]
+}
+
+model Evaluation {
+  student   Student @relation(fields: [studentID], references: [id])
+  studentID String
+
+  assessment   Assessment @relation(fields: [assessmentID], references: [id])
+  assessmentID String
+
+  obtainedMark Float
+
+  @@id([studentID, assessmentID])
+}
+
+model PLO {
+  id         String @id @default(uuid())
+  ploNumber  Int
+  ploDetails String @db.VarChar(512)
+
+  program   Program @relation(fields: [programID], references: [id])
+  programID String
+
+  cos CO[]
+}
+
+model CO {
+  id        String @id @default(uuid())
+  coNumber  Int
+  coDetails String @db.VarChar(512)
+
+  course   Course @relation(fields: [courseID], references: [id])
+  courseID String
+
+  plo   PLO    @relation(fields: [ploID], references: [id])
+  ploID String
+
+  assessments Assessment[]
 }
 
 enum UserType {
@@ -85,24 +187,44 @@ enum UserType {
   STUDENT
 }
 
-model User {
-  id String @id @default(uuid())
-  organizationID String @db.VarChar(20)
-  firstName String @db.VarChar(55)
-  lastName String @db.VarChar(55)
-  email String @db.VarChar(55)
-  phone String @db.Char(14)
-  house String? @db.VarChar(30)
-  street String? @db.VarChar(100)
-  town String @db.VarChar(100)
-  city String @db.VarChar(100)
+model Student {
+  id          String   @id @default(uuid())
+  StudentID   String   @db.VarChar(20)
+  firstName   String   @db.VarChar(55)
+  lastName    String   @db.VarChar(55)
+  email       String   @db.VarChar(55)
+  phone       String   @db.Char(14)
+  house       String?  @db.VarChar(30)
+  street      String?  @db.VarChar(100)
+  town        String   @db.VarChar(100)
+  city        String   @db.VarChar(100)
   dateOfBirth DateTime @db.Date
   joiningDate DateTime @db.Date
-  userType UserType
 
-  program Program? @relation(fields: [programID], references: [id])
-  programID String?
+  program   Program @relation(fields: [programID], references: [id])
+  programID String
 
-  department Department? @relation(fields: [departmentID], references: [id])
-  departmentID String?
+  courseRegistrations CourseRegistration[]
+
+  evaluations          Evaluation[]
+}
+
+model Faculty {
+  id          String   @id @default(uuid())
+  FacultyID   String   @db.VarChar(20)
+  firstName   String   @db.VarChar(55)
+  lastName    String   @db.VarChar(55)
+  email       String   @db.VarChar(55)
+  phone       String   @db.Char(14)
+  house       String?  @db.VarChar(30)
+  street      String?  @db.VarChar(100)
+  town        String   @db.VarChar(100)
+  city        String   @db.VarChar(100)
+  dateOfBirth DateTime @db.Date
+  joiningDate DateTime @db.Date
+
+  department   Department @relation(fields: [departmentID], references: [id])
+  departmentID String
+
+  courseSections Section[]
 }
