@@ -184,19 +184,33 @@ enum UserType {
   STUDENT
 }
 
-model Student {
+model User {
   id          String   @id @default(uuid())
-  studentID   String   @db.VarChar(20)
   firstName   String   @db.VarChar(55)
   lastName    String   @db.VarChar(55)
-  email       String   @db.VarChar(55)
-  phone       String   @db.Char(14)
+  email       String   @db.VarChar(55) @unique
+  phone       String   @db.Char(14) @unique
   house       String?  @db.VarChar(30)
   street      String?  @db.VarChar(100)
   town        String   @db.VarChar(100)
   city        String   @db.VarChar(100)
   dateOfBirth DateTime @db.Date
   joiningDate DateTime @db.Date
+  userType UserType
+
+  student Student?
+  faculty Faculty?
+  superAdmin SuperAdmin?
+
+  auth Auth?
+}
+
+model Student {
+  id          String   @id @default(uuid())
+  studentID   String   @db.VarChar(20)
+
+  user User @relation(fields: [userID], references: [id])
+  userID String @unique
 
   program   Program @relation(fields: [programID], references: [id])
   programID String
@@ -209,16 +223,9 @@ model Student {
 model Faculty {
   id          String   @id @default(uuid())
   facultyID   String   @db.VarChar(20)
-  firstName   String   @db.VarChar(55)
-  lastName    String   @db.VarChar(55)
-  email       String   @db.VarChar(55)
-  phone       String   @db.Char(14)
-  house       String?  @db.VarChar(30)
-  street      String?  @db.VarChar(100)
-  town        String   @db.VarChar(100)
-  city        String   @db.VarChar(100)
-  dateOfBirth DateTime @db.Date
-  joiningDate DateTime @db.Date
+  
+  user User @relation(fields: [userID], references: [id])
+  userID String @unique
 
   department   Department @relation(fields: [departmentID], references: [id])
   departmentID String
@@ -229,14 +236,16 @@ model Faculty {
 model SuperAdmin {
   id          String   @id @default(uuid())
   organizationID   String   @db.VarChar(20)
-  firstName   String   @db.VarChar(55)
-  lastName    String   @db.VarChar(55)
-  email       String   @db.VarChar(55)
-  phone       String   @db.Char(14)
-  house       String?  @db.VarChar(30)
-  street      String?  @db.VarChar(100)
-  town        String   @db.VarChar(100)
-  city        String   @db.VarChar(100)
-  dateOfBirth DateTime @db.Date
-  joiningDate DateTime @db.Date
+
+  user User @relation(fields: [userID], references: [id])
+  userID String @unique
+}
+
+model Auth {
+  id String @id @default(uuid())
+  email String @unique
+  password Bytes @db.Blob
+
+  user User @relation(fields: [userID], references: [id])
+  userID String @unique
 }
