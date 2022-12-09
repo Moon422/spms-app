@@ -186,7 +186,7 @@ enum UserType {
 
 model Student {
   id          String   @id @default(uuid())
-  StudentID   String   @db.VarChar(20)
+  studentID   String   @db.VarChar(20)
   firstName   String   @db.VarChar(55)
   lastName    String   @db.VarChar(55)
   email       String   @db.VarChar(55)
@@ -208,7 +208,7 @@ model Student {
 
 model Faculty {
   id          String   @id @default(uuid())
-  FacultyID   String   @db.VarChar(20)
+  facultyID   String   @db.VarChar(20)
   firstName   String   @db.VarChar(55)
   lastName    String   @db.VarChar(55)
   email       String   @db.VarChar(55)
@@ -224,4 +224,19 @@ model Faculty {
   departmentID String
 
   courseSections Section[]
+}
+
+model SuperAdmin {
+  id          String   @id @default(uuid())
+  organizationID   String   @db.VarChar(20)
+  firstName   String   @db.VarChar(55)
+  lastName    String   @db.VarChar(55)
+  email       String   @db.VarChar(55)
+  phone       String   @db.Char(14)
+  house       String?  @db.VarChar(30)
+  street      String?  @db.VarChar(100)
+  town        String   @db.VarChar(100)
+  city        String   @db.VarChar(100)
+  dateOfBirth DateTime @db.Date
+  joiningDate DateTime @db.Date
 }
