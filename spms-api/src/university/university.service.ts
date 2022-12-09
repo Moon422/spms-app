@@ -12,14 +12,16 @@ export class UniversityService {
         return universities;
     }
 
-    async addUniversity(university: CreateUniversityDto) {
+    async addUniversity(universityDto: CreateUniversityDto) {
         try {
-            const addedUni = await this.dbService.university.create({
+            const university = await this.dbService.university.create({
                 data: {
-                    universityName: university.name,
-                    universityDomain: university.domain
+                    universityName: universityDto.name,
+                    universityDomain: universityDto.domain
                 }
             });
+
+            return university ? true : false;
         } catch (e) {
             console.log(e);
             return false;

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { DbService } from 'src/db/db.service';
 import { CreateSchoolDto } from './school.dto';
 
@@ -9,22 +9,48 @@ export class SchoolService {
     }
 
     async getAllSchools() {
-        const schools = await this.dbService.school.findMany();
+        const schools = await this.dbService.school.findMany({
+            include: {
+                university: {
+                    select: {
+                        id: true,
+                        universityName: true
+                    }
+                }
+            }
+        });
+
+        return schools;
     }
 
-    createSchool(schoolDto: CreateSchoolDto) {
+    async createSchool(schoolDto: CreateSchoolDto) {
+        // console.log(schoolDto);
         try {
-            const school = this.dbService.school.create({
+            const school = await this.dbService.school.create({
                 data: {
                     schoolName: schoolDto.name,
                     schoolCode: schoolDto.code,
+                    universityID: schoolDto.universityID
+                },
+                include: {
                     university: {
-                        connect: {
-                            
+                        select: {
+                            universityName: true
                         }
                     }
                 }
-            })
+            });
+
+            if (school) {
+                console.log(school.university);
+                return true;
+            } else {
+                return false;
+            }
+        }
+        catch (e) {
+            console.log(e)
+            return false;
         }
     }
 }

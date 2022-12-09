@@ -29,7 +29,6 @@ model School {
 model Department {
   id             String @id @default(uuid())
   departmentName String @db.VarChar(255)
-  departmentCode String @db.VarChar(6)
 
   school   School @relation(fields: [schoolID], references: [id])
   schoolID String
