@@ -26,7 +26,12 @@ export class AuthService {
                 auth: {
                     create: {
                         email: "mahfuzurrm98@gmail.com",
-                        password: 
+                        password: passwordHash
+                    }
+                },
+                superAdmin: {
+                    create: {
+                        organizationID: "007"
                     }
                 }
             }
