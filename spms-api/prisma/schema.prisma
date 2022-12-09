@@ -244,7 +244,7 @@ model SuperAdmin {
 model Auth {
   id String @id @default(uuid())
   email String @unique
-  password Bytes @db.Blob
+  password String
 
   user User @relation(fields: [userID], references: [id])
   userID String @unique
